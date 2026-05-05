@@ -2,6 +2,8 @@ import ui
 import console
 import clipboard
 import photos
+import io
+import os
 
 class Extracter(ui.View):
     def __init__(self):
@@ -14,12 +16,25 @@ class Extracter(ui.View):
     def take_photo_action(self, sender):
         image = photos.capture_image()
         
-        # Check if image is None before doing anything
         if image is None:
-            console.alert('No photo taken', 'Please take a photo before saving.', 'OK', hide_cancel_button=True)
+            console.hud_alert('No photo taken', 'error', 1.0)
             return
         
-        photos.save_image(image)
+        # Save to a BytesIO buffer
+        buffer = io.BytesIO()
+        image.save(buffer, format='JPEG')
+        byte_data = buffer.getvalue()
+        
+        # Save the bytes to a file
+        save_dir = os.path.expanduser('~/Documents/captures')
+        os.makedirs(save_dir, exist_ok=True)
+        
+        import time
+        filepath = os.path.join(save_dir, f'photo_{time.time()}.jpg')
+        with open(filepath, 'wb') as f:
+            f.write(byte_data)
+        
+        print(f'Saved {len(byte_data)} bytes to {filepath}')
         console.hud_alert('Photo saved!', 'success', 1.0)
 
 if __name__ == '__main__':

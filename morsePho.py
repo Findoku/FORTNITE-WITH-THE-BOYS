@@ -3,6 +3,7 @@ import io
 import objc_util
 import requests
 import json
+import keychain 
 
 def image_to_text(image):
     buffer = io.BytesIO()
@@ -33,7 +34,7 @@ def image_to_text(image):
     return '\n'.join(results)
 
 def extract_question_with_claude(raw_text):
-    api_key = keychain.get_password('anthropic', 'api_key')
+    api_key = keychain.get_password('anthropic', 'api_key', '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')
     
     response = requests.post(
         'https://api.anthropic.com/v1/messages',

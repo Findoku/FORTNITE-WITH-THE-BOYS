@@ -32,9 +32,8 @@ def image_to_text(image):
 
     return '\n'.join(results)
 
-
 def extract_question_with_claude(raw_text):
-    api_key = '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'  # get from console.anthropic.com
+    api_key = keychain.get_password('anthropic', 'api_key')
     
     response = requests.post(
         'https://api.anthropic.com/v1/messages',
@@ -49,28 +48,25 @@ def extract_question_with_claude(raw_text):
             'messages': [
                 {
                     'role': 'user',
-                    'content': f'''The following is raw OCR text extracted from a photo of a multiple choice question. 
-There may be extra noise, page numbers, watermarks, or irrelevant text mixed in.
+                    'content': f'''Extract only the multiple choice question and answer choices from this raw OCR text. Format as Question: ... A) ... B) ... etc.
 
-Please extract ONLY:
-1. The question
-2. The answer choices (A, B, C, D etc.)
-
-Format it cleanly like:
-Question: ...
-A) ...
-B) ...
-C) ...
-D) ...
-
-Raw OCR text:
+Raw text:
 {raw_text}'''
                 }
             ]
         }
     )
     
+    # Print full response so we can see the error
+    print('Status code:', response.status_code)
+    print('Full response:', response.text)
+    
     data = response.json()
+    
+    # Check for error in response
+    if 'error' in data:
+        return f"API Error: {data['error']['message']}"
+    
     return data['content'][0]['text']
 
 

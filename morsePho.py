@@ -26,7 +26,7 @@ class Extracter(ui.View):
         byte_data = buffer.getvalue()
         
         # Save the bytes to a file
-        save_dir = os.path.expanduser('~/Documents/captures')
+        save_dir = os.path.expanduser('~/Documents/photos nmorse code/photos')
         os.makedirs(save_dir, exist_ok=True)
         
         import time

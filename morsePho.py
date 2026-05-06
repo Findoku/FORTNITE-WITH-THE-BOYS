@@ -96,7 +96,7 @@ Question:
 
 
 def save_to_file(formatted, answer):
-    save_dir = os.path.expanduser('~/photos nmorse code')
+    save_dir = os.path.expanduser('./')
     os.makedirs(save_dir, exist_ok=True)
     
     log_file = os.path.join(save_dir, 'questions_log.txt')

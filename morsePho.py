@@ -2,8 +2,7 @@ import photos
 import io
 import objc_util
 import requests
-import json
-import keychain 
+import keychain
 
 def image_to_text(image):
     buffer = io.BytesIO()
@@ -33,42 +32,64 @@ def image_to_text(image):
 
     return '\n'.join(results)
 
-def extract_question_with_claude(raw_text):
-    api_key = keychain.get_password('anthropic', 'api_key', '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')
-    
-    response = requests.post(
-        'https://api.anthropic.com/v1/messages',
-        headers={
-            'x-api-key': api_key,
-            'anthropic-version': '2023-06-01',
-            'content-type': 'application/json'
-        },
-        json={
-            'model': 'claude-sonnet-4-20250514',
-            'max_tokens': 1024,
-            'messages': [
-                {
-                    'role': 'user',
-                    'content': f'''Extract only the multiple choice question and answer choices from this raw OCR text. Format as Question: ... A) ... B) ... etc.
+def gemini(prompt):
+    api_key = keychain.get_password('gemini', 'api_key')
+    url = f'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}'
 
-Raw text:
-{raw_text}'''
+    response = requests.post(
+        url,
+        headers={'content-type': 'application/json'},
+        json={
+            'contents': [
+                {
+                    'parts': [
+                        {'text': prompt}
+                    ]
                 }
             ]
         }
     )
-    
-    # Print full response so we can see the error
-    print('Status code:', response.status_code)
-    print('Full response:', response.text)
-    
+
     data = response.json()
-    
-    # Check for error in response
+
     if 'error' in data:
-        return f"API Error: {data['error']['message']}"
-    
-    return data['content'][0]['text']
+        raise Exception(data['error']['message'])
+
+    return data['candidates'][0]['content']['parts'][0]['text'].strip()
+
+
+def format_question(raw_text):
+    prompt = f'''You are a text parser. Below is raw OCR text taken from a photo of a multiple choice question.
+It may contain noise, page numbers, watermarks, or garbled text.
+
+Extract and reformat it cleanly like this:
+Question: ...
+A) ...
+B) ...
+C) ...
+D) ...
+
+Only include the question and answer choices. Nothing else.
+
+Raw OCR text:
+{raw_text}'''
+
+    return gemini(prompt)
+
+
+def get_answer(formatted_question):
+    prompt = f'''You are answering a multiple choice question.
+
+Rules:
+- Respond with ONLY one character: A, B, C, or D
+- Do NOT include explanation
+- Do NOT include words
+- Do NOT include punctuation
+
+Question:
+{formatted_question}'''
+
+    return gemini(prompt)
 
 
 # --- Main ---
@@ -78,17 +99,18 @@ image = photos.capture_image()
 if image is None:
     print('No photo taken.')
 else:
-    print('Running OCR...')
     try:
+        print('Running OCR...')
         raw_text = image_to_text(image)
-        print('Raw OCR output:')
-        print(raw_text)
-        
-        print('\nCleaning up with Claude...')
-        clean = extract_question_with_claude(raw_text)
-        
-        print('\n--- Extracted Question ---')
-        print(clean)
-        
+
+        print('Formatting question...')
+        formatted = format_question(raw_text)
+        print('\n--- Formatted Question ---')
+        print(formatted)
+
+        print('\nGetting answer...')
+        answer = get_answer(formatted)
+        print(f'\nAnswer: {answer}')
+
     except Exception as e:
         print(f'Error: {e}')

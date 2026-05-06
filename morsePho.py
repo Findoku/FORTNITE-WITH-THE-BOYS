@@ -188,6 +188,31 @@ while True:
 
     if image is None:
         print('No photo taken.')
+        vibrate_dash()
+        time.sleep(0.1)
+        vibrate_dash()
+        time.sleep(0.1)
+        vibrate_dash()
+        time.sleep(0.1)
+        vibrate_dash()
+        time.sleep(0.1)
+        vibrate_dash()
+        time.sleep(0.1)
+        vibrate_dash()
+        time.sleep(0.1)
+        vibrate_dash()
+        time.sleep(0.1)
+        vibrate_dash()
+        time.sleep(0.1)
+        vibrate_dash()
+        time.sleep(0.1)
+        vibrate_dash()
+        time.sleep(0.1)
+        vibrate_dash()
+        time.sleep(0.1)
+        vibrate_dash()
+        time.sleep(0.1)
+        exit(-1)
     else:
         try:
             

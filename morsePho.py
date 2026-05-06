@@ -36,7 +36,7 @@ def image_to_text(image):
 
 def gemini(prompt):
     api_key = keychain.get_password('gemini', 'api_key')
-    url = f'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}'
+    url = f'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-pro-preview:generateContent?key={api_key}'
 
     response = requests.post(
         url,

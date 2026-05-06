@@ -1,8 +1,10 @@
 import photos
 import io
 import objc_util
-import requests
+import requests     
+
 import keychain
+
 
 def image_to_text(image):
     buffer = io.BytesIO()

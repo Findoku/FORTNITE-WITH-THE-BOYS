@@ -180,35 +180,38 @@ Answer: {answer}
     print(f'Saved to: {log_file}')
 
 
-# --- Main ---
-print('Opening camera...')
-image = photos.capture_image()
 
-if image is None:
-    print('No photo taken.')
-else:
-    try:
-        print('Running OCR...')
-        raw_text = image_to_text(image)
+while True:
+    # --- Main ---
+    print('Opening camera...')
+    image = photos.capture_image()
 
-        print('Formatting question...')
-        formatted = format_question(raw_text)
-        print('\n--- Formatted Question ---')
-        print(formatted)
+    if image is None:
+        print('No photo taken.')
+    else:
+        try:
+            
+            print('Running OCR...')
+            raw_text = image_to_text(image)
 
-        print('\nGetting answer...')
-        answer = get_answer(formatted)
-        print(f'\nAnswer: {answer}')
+            print('Formatting question...')
+            formatted = format_question(raw_text)
+            print('\n--- Formatted Question ---')
+            print(formatted)
 
-        save_to_file(formatted, answer)
+            print('\nGetting answer...')
+            answer = get_answer(formatted)
+            print(f'\nAnswer: {answer}')
 
-        print(f'\nVibrating answer in Morse code: {answer}')
-        vibrate_morse(answer)
-        time.sleep(0.4)
-        vibrate_morse(answer)
-        time.sleep(0.4)
-        vibrate_morse(answer)
-        time.sleep(0.4)
+            save_to_file(formatted, answer)
 
-    except Exception as e:
-        print(f'Error: {e}')
+            print(f'\nVibrating answer in Morse code: {answer}')
+            vibrate_morse(answer)
+            time.sleep(0.4)
+            vibrate_morse(answer)
+            time.sleep(0.4)
+            vibrate_morse(answer)
+            time.sleep(0.4)
+
+        except Exception as e:
+            print(f'Error: {e}')

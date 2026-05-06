@@ -3,6 +3,8 @@ import io
 import objc_util
 import requests     
 import keychain
+import os
+import time
 
 
 def image_to_text(image):
@@ -93,6 +95,30 @@ Question:
     return gemini(prompt)
 
 
+def save_to_file(formatted, answer):
+    save_dir = os.path.expanduser('~/photos nmorse code')
+    os.makedirs(save_dir, exist_ok=True)
+    
+    log_file = os.path.join(save_dir, 'questions_log.txt')
+    timestamp = time.strftime('%Y-%m-%d %H:%M:%S')
+    
+    entry = f'''
+==========================================
+{timestamp}
+==========================================
+{formatted}
+
+Answer: {answer}
+==========================================
+
+'''
+    
+    with open(log_file, 'a') as f:
+        f.write(entry)
+    
+    print(f'Saved to: {log_file}')
+
+
 # --- Main ---
 print('Opening camera...')
 image = photos.capture_image()
@@ -112,6 +138,8 @@ else:
         print('\nGetting answer...')
         answer = get_answer(formatted)
         print(f'\nAnswer: {answer}')
+
+        save_to_file(formatted, answer)
 
     except Exception as e:
         print(f'Error: {e}')

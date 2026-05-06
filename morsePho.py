@@ -131,6 +131,7 @@ A) ...
 B) ...
 C) ...
 D) ...
+(E or higher if you have to)
 
 Only include the question and answer choices. Nothing else.
 
@@ -144,7 +145,7 @@ def get_answer(formatted_question):
     prompt = f'''You are answering a multiple choice question.
 
 Rules:
-- Respond with ONLY one character: A, B, C, or D
+- Respond with ONLY one character: A, B, C, D (or E or higher if you have to)
 - Do NOT include explanation
 - Do NOT include words
 - Do NOT include punctuation
@@ -203,6 +204,11 @@ else:
 
         print(f'\nVibrating answer in Morse code: {answer}')
         vibrate_morse(answer)
+        time.sleep(0.4)
+        vibrate_morse(answer)
+        time.sleep(0.4)
+        vibrate_morse(answer)
+        time.sleep(0.4)
 
     except Exception as e:
         print(f'Error: {e}')

@@ -7,6 +7,65 @@ import os
 import time
 
 
+# Morse code dictionary
+MORSE = {
+    'A': '.-',   'B': '-...', 'C': '-.-.', 'D': '-..',
+    'E': '.',    'F': '..-.', 'G': '--.',  'H': '....',
+    'I': '..',   'J': '.---', 'K': '-.-',  'L': '.-..',
+    'M': '--',   'N': '-.',   'O': '---',  'P': '.--.',
+    'Q': '--.-', 'R': '.-.',  'S': '...',  'T': '-',
+    'U': '..-',  'V': '...-', 'W': '.--',  'X': '-..-',
+    'Y': '-.--', 'Z': '--..'
+}
+
+# Timing constants (in seconds)
+DOT      = 0.15
+DASH     = 0.45
+SYMBOL_GAP = 0.15
+LETTER_GAP = 0.5
+
+
+def vibrate_dot():
+    UIImpactFeedbackGenerator = objc_util.ObjCClass('UIImpactFeedbackGenerator')
+    gen = UIImpactFeedbackGenerator.alloc().initWithStyle_(2)
+    gen.prepare()
+    gen.impactOccurred()
+    time.sleep(0.15)  # short buzz
+
+
+def vibrate_dash():
+    UIImpactFeedbackGenerator = objc_util.ObjCClass('UIImpactFeedbackGenerator')
+    gen = UIImpactFeedbackGenerator.alloc().initWithStyle_(2)
+    gen.prepare()
+    # Fire multiple impacts rapidly to simulate a long buzz
+    for _ in range(6):
+        gen.impactOccurred()
+        time.sleep(0.05)
+
+
+def vibrate_morse(letter):
+    letter = letter.strip().upper()
+    if letter not in MORSE:
+        print(f'No Morse code for: {letter}')
+        return
+
+    pattern = MORSE[letter]
+    print(f'Vibrating Morse for {letter}: {pattern}')
+
+    for i, symbol in enumerate(pattern):
+        if symbol == '.':
+            vibrate_dot()
+        elif symbol == '-':
+            vibrate_dash()
+
+        # Gap between symbols
+        if i < len(pattern) - 1:
+            time.sleep(0.15)
+
+    # Pause after full letter
+    time.sleep(0.5)
+
+
 def image_to_text(image):
     buffer = io.BytesIO()
     image.save(buffer, format='JPEG')
@@ -34,6 +93,7 @@ def image_to_text(image):
         results.append(str(candidate.string()))
 
     return '\n'.join(results)
+
 
 def gemini(prompt):
     api_key = keychain.get_password('gemini', 'api_key')
@@ -98,10 +158,10 @@ Question:
 def save_to_file(formatted, answer):
     save_dir = os.path.expanduser('./')
     os.makedirs(save_dir, exist_ok=True)
-    
+
     log_file = os.path.join(save_dir, 'questions_log.txt')
     timestamp = time.strftime('%Y-%m-%d %H:%M:%S')
-    
+
     entry = f'''
 ==========================================
 {timestamp}
@@ -112,10 +172,10 @@ Answer: {answer}
 ==========================================
 
 '''
-    
+
     with open(log_file, 'a') as f:
         f.write(entry)
-    
+
     print(f'Saved to: {log_file}')
 
 
@@ -140,6 +200,9 @@ else:
         print(f'\nAnswer: {answer}')
 
         save_to_file(formatted, answer)
+
+        print(f'\nVibrating answer in Morse code: {answer}')
+        vibrate_morse(answer)
 
     except Exception as e:
         print(f'Error: {e}')
